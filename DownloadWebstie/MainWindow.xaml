@@ -9,7 +9,8 @@
     <StackPanel>
         <TextBlock x:Name="DisplayText"/>
         <TextBox x:Name="WebsiteUrl"/>
-        <Button Content="Click to download" Click="Button_Click" />
+        <TextBox x:Name="FileName"/>
+        <Button x:Name="SubmitButton" Content="Click to download" Click="Button_Click" />
         
     </StackPanel>
 </Window>
