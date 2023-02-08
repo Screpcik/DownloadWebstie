@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Documents;
 
 namespace DownloadWebstie
 {
@@ -13,8 +16,8 @@ namespace DownloadWebstie
     public partial class MainWindow : Window
     {
         public string DownloadedString { get; set; }
-
-        public event Action<string> StringDownloaded = (x) => {};
+        public FileDownloadData FileDownloadData { get; set; } = new FileDownloadData();
+        public event Action<string> StringDownloaded = (x) => { };
         public event Action<string, string> FileNameProvided = (x, y) => { };
 
 
@@ -52,26 +55,37 @@ namespace DownloadWebstie
         {
             if (DownloadedString != null)
             {
-                FileNameProvided.Invoke(FileName.Text, DownloadedString);
+                FileDownloadData.FileName = FileName.Text;
+
+                if (ValidateData())
+                {
+                    FileNameProvided.Invoke(FileDownloadData.FileName, DownloadedString);
+
+                }
+
                 return;
             }
 
-            var currentUrl = WebsiteUrl.Text;
-
-            await Task.Run(async () =>
+            FileDownloadData.Url = WebsiteUrl.Text;
+            if (ValidateData())
             {
-                var webClient = new WebClient();
-
-                var downloadedString = await webClient.DownloadStringTaskAsync(currentUrl);
-
-                Application.Current.Dispatcher.Invoke(() =>
+                await Task.Run(async () =>
                 {
-                    DisplayText.Text = "Sukces";
-                });
-                Thread.Sleep(500);
+                    var webClient = new WebClient();
 
-                StringDownloaded.Invoke(downloadedString);
-            });
+                    var downloadedString = await webClient.DownloadStringTaskAsync(FileDownloadData.Url);
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        DisplayText.Text = "Sukces";
+                    });
+                    Thread.Sleep(500);
+
+                    StringDownloaded.Invoke(downloadedString);
+                });
+
+            }
+           
         }
 
         private void SetControlStateAfterDownload()
@@ -86,6 +100,18 @@ namespace DownloadWebstie
         private void SaveToFile(string fileName, string downloadedString)
         {
             File.WriteAllText(fileName, downloadedString);
+        }
+
+        private bool ValidateData()
+        {
+            var validationContext = new ValidationContext(FileDownloadData);
+            var results = new List<ValidationResult>();
+            if (Validator.TryValidateObject(FileDownloadData, validationContext, results, true)) return true;
+            foreach (var result in results)
+            {
+                MessageBox.Show(result.ErrorMessage);
+            }
+            return false;
         }
     }
 }
