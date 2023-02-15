@@ -15,6 +15,9 @@ namespace DownloadWebstie
     /// </summary>
     public partial class MainWindow : Window
     {
+        /// <summary>
+        /// String that is downloaded from web
+        /// </summary>
         public string DownloadedString { get; set; }
         public FileDownloadData FileDownloadData { get; set; } = new FileDownloadData();
         public event Action<string> StringDownloaded = (x) => { };
@@ -50,7 +53,11 @@ namespace DownloadWebstie
 
             FileName.Visibility = Visibility.Hidden;
         }
-
+        /// <summary>
+        /// The function that is fired when user clicks button
+        /// </summary>
+        /// <param name="sender">sender of function = button</param>
+        /// <param name="e">EventArgs</param>
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             if (DownloadedString != null)

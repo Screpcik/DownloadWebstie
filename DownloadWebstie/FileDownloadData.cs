@@ -13,7 +13,6 @@ namespace DownloadWebstie
         [StringLength(100, MinimumLength = 5)]
         public string Url { get; set; }
 
-        [StringLength(100, MinimumLength = 5)]
         public string FileName { get; set; }
     }
 }
